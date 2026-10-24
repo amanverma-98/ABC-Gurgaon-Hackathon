@@ -1,0 +1,11 @@
+# AyushCare Mobile integration notes (updated)
+- Normal patient login uses `/api/v1/mobile/portal/auth/*` with JWT.
+- QR kiosk mode uses `/api/v1/mobile/kiosk-session/*` and intentionally bypasses patient portal login.
+- Kiosk QR pairing returns patient/session metadata without requiring a patient JWT.
+- Document upload: local File/Blob -> presigned S3 PUT -> register-document -> backend OCR/AI -> polling.
+- The mobile document flow now preserves the original File object and supports JPEG/PNG/WebP.
+- PDF is not sent to the current image OCR pipeline.
+- Portal dashboard, visits, and documents are now loaded from backend APIs after normal login.
+- Language selection synchronizes with the active kiosk consultation.
+- Privacy screen has quick server-backed toggles for diagnosis/AI findings, visit history, and reports/documents.
+- Camera screen uses a light AyushCare UI and the file input supports `capture="environment"` for phones where getUserMedia is unavailable over HTTP.

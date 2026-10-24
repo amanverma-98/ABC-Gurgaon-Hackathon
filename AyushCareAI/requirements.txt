@@ -1,0 +1,39 @@
+# FastAPI & Server
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+pydantic-settings
+
+# AI / LLM Provider
+groq
+
+# OCR & Vision (Groq Vision + Tesseract)
+Pillow
+pytesseract
+
+# Speech (ASR: Groq Whisper, TTS: Edge Neural TTS)
+edge-tts
+
+# Database
+sqlalchemy[asyncio]
+aiosqlite
+asyncpg
+alembic
+
+# Caching
+redis
+
+# Security
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Utilities
+httpx
+tenacity
+structlog
+python-dateutil
+
+# Testing
+pytest
+pytest-asyncio

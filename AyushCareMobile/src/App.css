@@ -1,0 +1,629 @@
+/* AyushCare Mobile responsive shell + UI layer */
+:root {
+  --mobile-teal: #087c73;
+  --mobile-teal-dark: #075e59;
+  --mobile-teal-soft: #e9f7f4;
+  --mobile-ink: #172a33;
+  --mobile-muted: #667981;
+  --mobile-line: #d9e5e4;
+  --mobile-bg: #f4f8f7;
+  --mobile-nav-height: 78px;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: url('/KioskScreenBg.png') center center / cover no-repeat fixed, #f1f8f7;
+  overflow: hidden;
+}
+
+#root {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Every routed screen gets a real viewport-sized scroll context. */
+#root > div:first-child,
+#root > div:first-of-type {
+  width: 100%;
+  min-height: 100dvh;
+  background: url('/KioskScreenBg.png') center center / cover no-repeat fixed, #f1f8f7;
+}
+
+/* Screens that contain the primary bottom navigation use a
+   fixed navigation bar + independently scrolling content. */
+#root > div:first-child:has(> nav[aria-label="Primary navigation"]),
+#root:has(nav[aria-label="Primary navigation"]) > div:first-of-type,
+#root:has(nav[aria-label="Primary navigation"]) > div:first-child {
+  height: 100dvh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+#root > div:first-child:has(> nav[aria-label="Primary navigation"]) > main,
+#root:has(nav[aria-label="Primary navigation"]) > div:first-of-type > main,
+#root:has(nav[aria-label="Primary navigation"]) > div:first-child > main {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: min(100%, 1100px);
+  max-width: 1100px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px) + 24px) !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+/* Flow/detail screens without the primary nav scroll as one page. */
+#root > div:first-child:not(:has(> nav[aria-label="Primary navigation"])),
+#root:not(:has(nav[aria-label="Primary navigation"])) > div:first-of-type,
+#root:not(:has(nav[aria-label="Primary navigation"])) > div:first-child,
+.mobile-auth-shell {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keep desktop/tablet content centered without leaving huge empty columns. */
+#root main {
+  width: 100%;
+}
+
+#root main > section,
+#root main > article,
+#root main > div {
+  max-width: 100%;
+}
+
+/* ============================================================
+   SHARED HEADER
+============================================================ */
+
+.mobile-header-brand {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid #e0ebea;
+}
+
+.mobile-header-brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Header is a chrome element, not a scrolling content area. */
+#root header {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   LANGUAGE SWITCHER
+============================================================ */
+
+.mobile-language-control,
+.mobile-language-floating {
+  position: relative;
+  z-index: 1000;
+  flex-shrink: 0;
+}
+
+.mobile-language-floating {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top, 0px));
+  right: 12px;
+}
+
+.mobile-language-button {
+  height: 46px;
+  min-width: 126px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #cfe3e1;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.97);
+  color: var(--mobile-teal-dark);
+  box-shadow: 0 5px 18px rgba(16, 64, 62, 0.08);
+  font-size: 14px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mobile-language-button:hover {
+  background: #f0faf8;
+  border-color: #9fcfc9;
+}
+
+.mobile-language-current {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-language-menu {
+  z-index: 10000;
+  max-height: min(470px, calc(100dvh - 90px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d7e6e4;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 20px 50px rgba(15, 50, 47, 0.18),
+    0 6px 18px rgba(15, 50, 47, 0.09);
+}
+
+.mobile-language-menu-title {
+  flex: 0 0 auto;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  border-bottom: 1px solid #e7efee;
+  background: #f7fbfa;
+  color: #52706d;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mobile-language-list {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overscroll-behavior: contain;
+}
+
+.mobile-language-list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.mobile-language-list::-webkit-scrollbar-thumb {
+  background: #a8ceca;
+  border-radius: 99px;
+}
+
+.mobile-language-option {
+  width: 100%;
+  min-height: 50px;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(88px, 1fr) minmax(70px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: #fff;
+  color: #2a4145;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mobile-language-option:hover {
+  background: #f2f8f7;
+  border-color: #d9ebe8;
+}
+
+.mobile-language-option.active {
+  background: var(--mobile-teal-soft);
+  border-color: #b7ddd8;
+  color: var(--mobile-teal-dark);
+}
+
+.mobile-language-native {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.mobile-language-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: #718583;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mobile-language-option.active .mobile-language-name {
+  color: #4c807b;
+}
+
+/* ============================================================
+   AUTH / BRAND
+============================================================ */
+
+.mobile-auth-shell {
+  height: 100dvh;
+  min-height: 100dvh;
+  padding: 18px 16px 28px;
+  background: url('/KioskScreenBg.png') center center / cover no-repeat fixed, #f1f8f7;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-auth-brand {
+  width: min(100%, 760px);
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-auth-logo-wrap {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-auth-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mobile-auth-brand strong {
+  display: block;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+}
+
+.brand-title-ayush {
+  color: #12383b;
+}
+
+.brand-title-care {
+  color: #438b34;
+}
+
+.mobile-auth-brand small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   CARDS / TOUCH CONTROLS
+============================================================ */
+
+#root .rounded-3xl {
+  border-radius: 20px;
+}
+
+#root .rounded-2xl {
+  border-radius: 15px;
+}
+
+#root button {
+  min-height: 44px;
+}
+
+#root input,
+#root select,
+#root textarea {
+  max-width: 100%;
+}
+
+#root .shadow-sm {
+  box-shadow: 0 5px 18px rgba(16, 45, 47, 0.055);
+}
+
+/* Make common card controls feel like one consistent ecosystem. */
+#root .border-slate-200.bg-white,
+#root .border-slate-100.bg-white,
+#root .ring-1.ring-slate-200 {
+  border-color: var(--mobile-line);
+}
+
+/* ============================================================
+   FIXED BOTTOM NAVIGATION
+============================================================ */
+
+.mobile-bottom-nav {
+  height: var(--mobile-nav-height);
+  min-height: var(--mobile-nav-height);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: content-box;
+  box-shadow: 0 -8px 24px rgba(15, 45, 47, 0.07);
+}
+
+.mobile-bottom-nav > div {
+  height: var(--mobile-nav-height);
+  max-width: 720px !important;
+  margin: 0 auto;
+}
+
+.mobile-bottom-nav-item {
+  min-height: 62px !important;
+  color: #6b7d81;
+}
+
+.mobile-bottom-nav-item:hover {
+  background: #f5faf9;
+}
+
+.mobile-bottom-nav-item.text-teal-700 {
+  color: var(--mobile-teal-dark) !important;
+}
+
+.mobile-bottom-nav-item .bg-teal-50 {
+  background: var(--mobile-teal-soft) !important;
+}
+
+/* ============================================================
+   BOTTOM ACTION BAR
+============================================================ */
+
+#root .pb-safe {
+  padding-bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 8px));
+}
+
+#root .mobile-bottom-nav ~ * {
+  z-index: auto;
+}
+
+/* ============================================================
+   DOCUMENT / IMAGE AREAS
+============================================================ */
+
+#root img {
+  max-width: 100%;
+}
+
+#root video,
+#root canvas {
+  max-width: 100%;
+}
+
+/* Camera preview must never overflow the viewport. */
+#root video {
+  object-fit: cover;
+}
+
+/* ============================================================
+   LARGE TABLET / TOUCH LAPTOP
+============================================================ */
+
+@media (min-width: 768px) {
+  :root {
+    --mobile-nav-height: 84px;
+  }
+
+  .mobile-language-button {
+    min-width: 142px;
+    height: 50px;
+    font-size: 15px;
+  }
+
+  .mobile-header-brand {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+  }
+
+  #root > div:first-child:has(> nav[aria-label="Primary navigation"]) > main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  #root .max-w-md {
+    max-width: 620px;
+  }
+
+  #root .max-w-2xl {
+    max-width: 820px;
+  }
+
+  #root .max-w-3xl {
+    max-width: 940px;
+  }
+
+  #root .max-w-4xl {
+    max-width: 1040px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mobile-language-button {
+    min-width: 150px;
+  }
+
+  #root > div:first-child:has(> nav[aria-label="Primary navigation"]) > main {
+    padding-left: 34px !important;
+    padding-right: 34px !important;
+  }
+
+  #root .max-w-md {
+    max-width: 680px;
+  }
+
+  #root .max-w-2xl {
+    max-width: 900px;
+  }
+
+  #root .max-w-3xl,
+  #root .max-w-4xl {
+    max-width: 1060px;
+  }
+}
+
+/* ============================================================
+   PHONE
+============================================================ */
+
+@media (max-width: 640px) {
+  :root {
+    --mobile-nav-height: 72px;
+  }
+
+  .mobile-header-brand {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .mobile-language-control .mobile-language-button {
+    min-width: 92px;
+    height: 44px;
+    padding: 0 9px;
+  }
+
+  .mobile-language-control .mobile-language-current {
+    max-width: 48px;
+  }
+
+  .mobile-language-floating {
+    top: max(8px, env(safe-area-inset-top, 0px));
+    right: 9px;
+  }
+
+  .mobile-language-floating .mobile-language-button {
+    min-width: 106px;
+    height: 44px;
+  }
+
+  .mobile-language-menu {
+    max-width: calc(100vw - 20px);
+  }
+
+  .mobile-language-option {
+    min-height: 54px;
+    grid-template-columns: minmax(78px, 1fr) minmax(58px, 1fr) auto;
+    padding: 8px 9px;
+  }
+
+  .mobile-language-native {
+    font-size: 14px;
+  }
+
+  .mobile-language-name {
+    font-size: 11px;
+  }
+
+  .mobile-auth-shell {
+    padding: 12px 12px 24px;
+  }
+
+  #root .px-5 {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  #root .px-6 {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  #root .p-6 {
+    padding: 18px;
+  }
+
+  #root .p-5 {
+    padding: 16px;
+  }
+
+  #root .gap-6 {
+    gap: 18px;
+  }
+
+  #root .gap-5 {
+    gap: 16px;
+  }
+}
+
+/* Very narrow phones */
+@media (max-width: 380px) {
+  .mobile-language-control .mobile-language-current {
+    display: none;
+  }
+
+  .mobile-language-control .mobile-language-button {
+    min-width: 48px;
+    width: 48px;
+    padding: 0;
+  }
+
+  .mobile-bottom-nav-item {
+    min-height: 58px !important;
+    font-size: 10px !important;
+  }
+
+  .mobile-bottom-nav-item > span:first-child {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+/* ============================================================
+   ACCESSIBILITY
+============================================================ */
+
+html[data-reduce-motion="true"] .mobile-language-option,
+html[data-reduce-motion="true"] button {
+  transition: none !important;
+}
+
+html[data-high-contrast="true"] .mobile-language-button,
+html[data-high-contrast="true"] .mobile-language-menu,
+html[data-high-contrast="true"] .mobile-language-option {
+  border-color: #0f172a !important;
+}
+
+/* ============================================================
+   FLOW BACK-BUTTON DEDUPLICATION
+============================================================ */
+
+/* M4/M6/M8 already provide Back + Next in the bottom action row.
+   Hide only the duplicate header back control. */
+html[data-mobile-screen="M4"] header button[aria-label="Back to camera"],
+html[data-mobile-screen="M6"] header button[aria-label="Back"],
+html[data-mobile-screen="M8"] header button[aria-label="Go back"] {
+  display: none !important;
+}
+
+/* Keep the bottom action row above the fixed primary navigation
+   if both are ever present. */
+#root .fixed.bottom-0 {
+  z-index: 70;
+}

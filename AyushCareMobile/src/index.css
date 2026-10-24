@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --kiosk-teal: #006666;
+    --kiosk-teal-dark: #005454;
+    --kiosk-teal-light: #0d9488;
+    --kiosk-teal-soft: #e8f4f3;
+    --kiosk-bg: #f8fafc;
+    --kiosk-text: #0f172a;
+    --kiosk-muted: #64748b;
+    --kiosk-border: #e2e8f0;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    font-family:
+      Inter,
+      "Noto Sans Devanagari",
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    touch-action: manipulation;
+  }
+}
+
+/* Safe area insets for mobile */
+.pb-safe {
+  padding-bottom: max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 1rem));
+}
+
+.pt-safe {
+  padding-top: max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.5rem));
+}
+
+
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.8s ease-in-out infinite;
+}
+
+/* Hide scrollbar while allowing scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ------------------------------------------------------------- */
+/* ACCESSIBILITY UTILITY THEMES (Cleaned for Prompt 8)          */
+/* ------------------------------------------------------------- */
+
+/* Text Sizing: Sets root font scale so all rem units visibly adapt */
+html[data-text-size="default"] {
+  font-size: 16px;
+}
+
+html[data-text-size="large"] {
+  font-size: 18px;
+}
+
+html[data-text-size="xlarge"] {
+  font-size: 20px;
+}
+
+.text-size-large {
+  font-size: 1.125rem;
+}
+
+.text-size-xlarge {
+  font-size: 1.25rem;
+}
+
+/* High Contrast Mode: Semantic theme values (no global contrast filters) */
+html[data-high-contrast="true"],
+.theme-high-contrast {
+  --tw-border-opacity: 1;
+}
+
+html[data-high-contrast="true"] body,
+.theme-high-contrast body,
+.theme-high-contrast {
+  color: #020617 !important;
+}
+
+html[data-high-contrast="true"] .border,
+html[data-high-contrast="true"] [class*="border-"],
+.theme-high-contrast .border,
+.theme-high-contrast [class*="border-"] {
+  border-color: #0f172a !important;
+}
+
+html[data-high-contrast="true"] .text-slate-500,
+html[data-high-contrast="true"] .text-slate-400,
+.theme-high-contrast .text-slate-500,
+.theme-high-contrast .text-slate-400 {
+  color: #1e293b !important;
+}
+
+html[data-high-contrast="true"] button,
+.theme-high-contrast button {
+  outline: 2px solid transparent;
+}
+
+html[data-high-contrast="true"] button:focus-visible,
+.theme-high-contrast button:focus-visible {
+  outline: 3px solid #003b3b !important;
+  outline-offset: 2px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite !important;
+}
+
+.mobile-app-loading {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 24px;
+  text-align: center;
+  color: #044e42;
+}
+.mobile-app-loading strong { font-size: 1rem; font-weight: 800; }
+.mobile-app-loading > span { max-width: 280px; color: #64748b; font-size: .8rem; line-height: 1.5; }
+.mobile-loading-orbit { width: 58px; height: 58px; display: grid; place-items: center; border: 4px solid #d7f1ed; border-top-color: #008f82; border-radius: 50%; animation: spin 1.1s linear infinite; }
+.mobile-loading-spinner { width: 25px; height: 25px; border: 3px solid #b9e5df; border-top-color: #006b62; border-radius: 50%; animation: spin .75s linear infinite reverse; }
+
+/* Reduced Motion Mode: never disables functional spinners or progress bars */
+html[data-reduce-motion="true"] *:not(.animate-spin):not([class*="animate-spin"]):not([class*="transition-all"]):not([style*="width"]),
+.theme-reduce-motion *:not(.animate-spin):not([class*="animate-spin"]):not([class*="transition-all"]):not([style*="width"]) {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}

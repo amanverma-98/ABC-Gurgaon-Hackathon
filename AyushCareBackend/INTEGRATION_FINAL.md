@@ -1,0 +1,2 @@
+# Final Backend Integration
+New: POST `/api/v1/intake/session/:session_id/patient-upload-qr`; POST `/api/v1/mobile/portal/qr/exchange`; POST `/api/v1/mobile/portal/documents/register`; GET `/api/v1/mobile/portal/documents/:document_id`. `patient_qr_tokens` and privacy-sharing columns are added by schema init/migration. AI base URL loop detection prevents the backend from calling itself when `MEDIKIOSK_AI_BASE_URL` points at the backend port.

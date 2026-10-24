@@ -1,0 +1,2 @@
+# Final Mobile Integration
+Normal portal login is mobile OTP -> JWT. Hospital QR login is one-time `qr_token` -> the same patient JWT -> direct document upload screen. Kiosk-session pairing UI/services are removed from active Mobile. Images use direct S3 presigned upload, then backend registration and AI/OCR processing; documents are linked to the patient consultation/account and retrieved with signed URLs. Privacy controls cover previous departments, previous reports, and previous appointments.

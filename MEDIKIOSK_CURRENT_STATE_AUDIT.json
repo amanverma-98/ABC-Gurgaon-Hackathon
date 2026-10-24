@@ -1,0 +1,431 @@
+{
+  "projects": {
+    "python_ai": {
+      "project_root": "AyushCareAI",
+      "framework": "FastAPI",
+      "runtime": "Python 3.10+",
+      "language": "Python",
+      "package_manager": "pip / poetry",
+      "config_files": ["pyproject.toml", "requirements.txt", "Dockerfile", "docker-compose.yml"],
+      "entry_point": "app/main.py",
+      "source_directories": ["app/ai", "app/api", "app/domain", "app/infrastructure", "app/models", "app/services"],
+      "database": "SQLite (dev: medikiosk_dev.db via SQLAlchemy async) / PostgreSQL (prod)",
+      "redis": "redis://localhost:6379/0 (with in-memory fallback dict)"
+    },
+    "node_backend": {
+      "project_root": "AyushCareBackend",
+      "framework": "Express.js",
+      "runtime": "Node.js (ES Modules)",
+      "language": "JavaScript",
+      "package_manager": "npm",
+      "config_files": ["package.json", "package-lock.json"],
+      "entry_point": "src/index.js (server) / src/app.js (express)",
+      "source_directories": ["src/controllers", "src/database", "src/middleware", "src/routes", "src/services", "src/utilities"],
+      "database": "PostgreSQL (Neon Serverless via pg.Pool)",
+      "redis": "None (uses in-memory Map for OTPs)"
+    },
+    "kiosk": {
+      "project_root": "AyushCareKiosk",
+      "framework": "React 18 + Vite",
+      "runtime": "Browser / Chromium Kiosk",
+      "language": "JavaScript (JSX)",
+      "package_manager": "npm",
+      "config_files": ["package.json", "vite.config.js", "eslint.config.js"],
+      "entry_point": "src/main.jsx",
+      "source_directories": ["src/pages", "src/components", "src/services", "src/store", "src/constants", "src/loc"]
+    },
+    "mobile": {
+      "project_root": "AyushCareMobile",
+      "framework": "React 18 + Vite (PWA/Mobile Web)",
+      "runtime": "Browser (Mobile Viewport)",
+      "language": "JavaScript (JSX)",
+      "package_manager": "npm",
+      "config_files": ["package.json", "vite.config.js", "eslint.config.js"],
+      "entry_point": "src/main.jsx",
+      "source_directories": ["src/pages/mobile", "src/components", "src/services", "src/store", "src/data", "src/constants"]
+    },
+    "doctor_panel": {
+      "project_root": "HNDPANEL",
+      "framework": "Next.js 15 (App Router)",
+      "runtime": "Node.js + Browser",
+      "language": "TypeScript",
+      "package_manager": "npm",
+      "config_files": ["package.json", "tsconfig.json", "next.config.ts", "postcss.config.mjs"],
+      "entry_point": "src/app/layout.tsx / src/app/page.tsx",
+      "source_directories": ["src/app", "src/components", "src/services", "src/lib", "src/types", "src/data"]
+    }
+  },
+  "database": {
+    "engine_backend": "PostgreSQL (Neon)",
+    "engine_ai": "SQLite (development: medikiosk_dev.db) / PostgreSQL",
+    "backend_tables": [
+      {
+        "table": "hospitals",
+        "pk": "id (UUID)",
+        "columns": ["id", "name", "state_code", "created_at"],
+        "foreign_keys": []
+      },
+      {
+        "table": "users",
+        "pk": "id (UUID)",
+        "columns": ["id", "hospital_id", "name", "email", "password_hash", "role", "specialization", "is_active", "created_at"],
+        "foreign_keys": ["hospital_id -> hospitals.id"]
+      },
+      {
+        "table": "patients",
+        "pk": "id (UUID)",
+        "columns": ["id", "abha_number", "abha_address", "full_name", "gender", "date_of_birth", "mobile_number", "address", "aadhaar_number", "registration_type", "consent_granted", "consent_timestamp", "created_at"],
+        "foreign_keys": [],
+        "unique_constraints": ["abha_number", "abha_address"],
+        "indexes": ["idx_patients_mobile", "idx_patients_aadhaar", "idx_patients_abha_number"]
+      },
+      {
+        "table": "departments",
+        "pk": "id (UUID)",
+        "columns": ["id", "hospital_id", "name", "pathway", "is_active", "created_at"],
+        "foreign_keys": ["hospital_id -> hospitals.id"],
+        "unique_constraints": ["(hospital_id, name)"]
+      },
+      {
+        "table": "doctor_departments",
+        "pk": "(doctor_id, department_id)",
+        "columns": ["doctor_id", "department_id", "created_at"],
+        "foreign_keys": ["doctor_id -> users.id", "department_id -> departments.id"]
+      },
+      {
+        "table": "consultations",
+        "pk": "id (UUID)",
+        "columns": ["id", "hospital_id", "patient_id", "department_id", "assigned_doctor_id", "token_number", "status", "risk_level", "intake_pathway", "language", "ai_session_id", "remarks", "created_at", "updated_at"],
+        "foreign_keys": ["hospital_id -> hospitals.id", "patient_id -> patients.id", "department_id -> departments.id", "assigned_doctor_id -> users.id"]
+      },
+      {
+        "table": "clinical_summaries",
+        "pk": "id (UUID)",
+        "columns": ["id", "consultation_id", "chief_complaint", "history_of_present_illness", "past_medical_history", "drug_allergies", "medications", "ayush_attributes", "ai_payload", "generated_at", "updated_at"],
+        "foreign_keys": ["consultation_id -> consultations.id (UNIQUE)"]
+      },
+      {
+        "table": "uploaded_documents",
+        "pk": "id (UUID)",
+        "columns": ["id", "consultation_id", "file_path_hash", "document_type", "source_mime_type", "page_number", "total_pages", "extracted_data", "status", "processing_error", "created_at", "updated_at"],
+        "foreign_keys": ["consultation_id -> consultations.id"]
+      },
+      {
+        "table": "kiosk_sessions",
+        "pk": "id (UUID)",
+        "columns": ["id", "pairing_token", "kiosk_id", "consultation_id", "is_active", "expires_at", "created_at"],
+        "foreign_keys": ["consultation_id -> consultations.id"],
+        "unique_constraints": ["pairing_token"]
+      },
+      {
+        "table": "patient_qr_tokens",
+        "pk": "id (UUID)",
+        "columns": ["id", "token_hash", "patient_id", "consultation_id", "expires_at", "used_at", "created_at"],
+        "foreign_keys": ["patient_id -> patients.id", "consultation_id -> consultations.id"],
+        "unique_constraints": ["token_hash"]
+      },
+      {
+        "table": "vitals",
+        "pk": "id (UUID)",
+        "columns": ["id", "consultation_id", "systolic", "diastolic", "pulse", "temperature", "spo2", "source", "recorded_at"],
+        "foreign_keys": ["consultation_id -> consultations.id (UNIQUE)"]
+      },
+      {
+        "table": "consent_records",
+        "pk": "id (UUID)",
+        "columns": ["id", "consultation_id", "scope_id", "title", "purpose", "required", "status", "granted_at", "withdrawn_at"],
+        "foreign_keys": ["consultation_id -> consultations.id"]
+      },
+      {
+        "table": "patient_privacy_rules",
+        "pk": "id (UUID)",
+        "columns": ["id", "patient_id", "scope_type", "hospital_id", "consultation_id", "document_id", "allow_doctor_access", "reason", "created_at", "updated_at"],
+        "foreign_keys": ["patient_id -> patients.id", "hospital_id -> hospitals.id", "consultation_id -> consultations.id", "document_id -> uploaded_documents.id"]
+      },
+      {
+        "table": "privacy_settings",
+        "pk": "id (UUID)",
+        "columns": ["id", "patient_id", "isolate_past_history", "consent_voice_processing", "share_previous_departments", "share_previous_reports", "share_previous_appointments", "lock_diagnosis", "lock_visits", "lock_reports", "updated_at"],
+        "foreign_keys": ["patient_id -> patients.id (UNIQUE)"]
+      },
+      {
+        "table": "audit_events",
+        "pk": "id (BIGSERIAL)",
+        "columns": ["id", "consultation_id", "actor_type", "actor_id", "event_type", "metadata", "created_at"],
+        "foreign_keys": ["consultation_id -> consultations.id"]
+      }
+    ],
+    "ai_sqlite_tables": [
+      "sessions",
+      "conversation_turns",
+      "documents",
+      "consent_receipts",
+      "audit_log"
+    ]
+  },
+  "patient_identity": {
+    "current_primary_key": "patients.id (UUID)",
+    "current_business_identifier": "Mixed: abha_number is unique and required on new registrations, but patient_id UUID is used for internal FKs and JWT subject.",
+    "is_patient_id_uuid": true,
+    "has_abha_field": true,
+    "is_abha_unique": true,
+    "is_abha_nullable": true,
+    "tables_referencing_patient_id": [
+      "consultations.patient_id",
+      "patient_qr_tokens.patient_id",
+      "patient_privacy_rules.patient_id",
+      "privacy_settings.patient_id"
+    ],
+    "synthetic_uhid": "Generated on frontend in HNDPANEL as `UHID-${consultationId.slice(0, 8).toUpperCase()}`. No database column exists."
+  },
+  "abha": {
+    "captured_in": ["Kiosk Screen2_Auth", "Mobile AuthScreen"],
+    "validated_in": [
+      "Node: normalizeDigits(abhaNumber, 14, 'ABHA number') in kiosk.controller.js",
+      "Mobile: 14 digit regex in authService.js"
+    ],
+    "stored_in": "patients.abha_number (VARCHAR 17)",
+    "normalized": "Stripped of non-digits; hyphens are removed (stored as 14 digits)",
+    "encrypted_or_hashed": "NO (stored as plain text)",
+    "returned_to_frontend": true,
+    "used_for_login": "Yes, in mobile portal OTP login and kiosk lookup",
+    "used_in_qr": "Returned in QR API response metadata, but QR token itself is random crypto token",
+    "used_in_python": "Sent as `patient_id` parameter to `POST /api/v1/sessions`",
+    "used_in_fhir": "Not determined from current code (mocked/basic placeholder in fhir_mapper.py)"
+  },
+  "node_backend": {
+    "server_entry": "src/index.js",
+    "app_entry": "src/app.js",
+    "port": 8000,
+    "websocket": "None (No Socket.IO server mounted)",
+    "redis": "None (No Redis client in package.json)",
+    "s3": "@aws-sdk/client-s3 + @aws-sdk/s3-request-presigner",
+    "sms": "Mock provider by default (smsHelper.js)",
+    "otp_store": "In-memory Map with 123456 dev bypass",
+    "routes": {
+      "auth": ["POST /api/v1/auth/register-admin", "POST /api/v1/auth/login", "POST /api/v1/auth/logout", "GET /api/v1/auth/me"],
+      "admin": ["GET /api/v1/admin/doctors", "GET /api/v1/admin/doctors/departments", "POST /api/v1/admin/doctors/departments", "GET /api/v1/admin/analytics/visits", "POST /api/v1/admin/queue/override"],
+      "doctor": ["GET /api/v1/doctor/queue", "GET /api/v1/doctor/patients/:id/summary", "GET /api/v1/doctor/patients/:id/reports", "PATCH /api/v1/doctor/consultations/:id/status", "POST /api/v1/doctor/consultations/:id/sign-off"],
+      "kiosk_intake": [
+        "POST /api/v1/intake/auth/abha", "GET /api/v1/intake/patients/lookup", "GET /api/v1/intake/system/health",
+        "POST /api/v1/intake/session", "GET /api/v1/intake/session/:session_id", "PUT /api/v1/intake/session/:session_id/language",
+        "PUT /api/v1/intake/session/:session_id/routing", "POST /api/v1/intake/session/:session_id/dialogue/start",
+        "GET /api/v1/intake/session/:session_id/dialogue/state", "POST /api/v1/intake/session/:session_id/dialogue/answer",
+        "POST /api/v1/intake/session/:session_id/dialogue/speech", "POST /api/v1/intake/session/:session_id/dialogue/tts",
+        "POST /api/v1/intake/session/:session_id/vitals", "GET /api/v1/intake/session/:session_id/documents",
+        "GET /api/v1/intake/departments", "GET /api/v1/intake/departments/:department_id/doctors",
+        "POST /api/v1/intake/session/:session_id/summary/generate", "GET /api/v1/intake/session/:session_id/summary",
+        "POST /api/v1/intake/session/:session_id/consent", "GET /api/v1/intake/session/:session_id/consent",
+        "POST /api/v1/intake/session/:session_id/token", "POST /api/v1/intake/session/:session_id/complete",
+        "POST /api/v1/intake/session/:session_id/cancel", "POST /api/v1/intake/session/:session_id/patient-upload-qr"
+      ],
+      "mobile": [
+        "GET /api/v1/mobile/kiosk-session/pair/:pairing_token", "POST /api/v1/mobile/kiosk-session/:session_id/upload-url",
+        "POST /api/v1/mobile/kiosk-session/:session_id/register-document", "GET /api/v1/mobile/kiosk-session/:session_id/documents",
+        "DELETE /api/v1/mobile/kiosk-session/:session_id/documents/:document_id", "PUT /api/v1/mobile/kiosk-session/:session_id/language",
+        "POST /api/v1/mobile/kiosk-session/:session_id/sync", "POST /api/v1/mobile/portal/qr/exchange",
+        "POST /api/v1/mobile/portal/auth/send-otp", "POST /api/v1/mobile/portal/auth/verify-otp",
+        "POST /api/v1/mobile/portal/select-patient", "GET /api/v1/mobile/portal/dashboard",
+        "GET /api/v1/mobile/portal/visits", "GET /api/v1/mobile/portal/visits/:visit_id",
+        "GET /api/v1/mobile/portal/audio-summary", "GET /api/v1/mobile/portal/documents",
+        "GET /api/v1/mobile/portal/documents/:document_id", "POST /api/v1/mobile/portal/documents/upload-url",
+        "POST /api/v1/mobile/portal/documents/register", "GET /api/v1/mobile/portal/privacy-settings",
+        "GET /api/v1/mobile/portal/privacy-context", "PATCH /api/v1/mobile/portal/privacy-rules",
+        "PATCH /api/v1/mobile/portal/privacy-settings"
+      ],
+      "language": ["GET /api/v1/language/languages", "POST /api/v1/language/translate", "POST /api/v1/language/tts", "POST /api/v1/language/asr"]
+    }
+  },
+  "python_ai": {
+    "port": 8001,
+    "entry_point": "app/main.py",
+    "llm_provider": "Groq (openai/gpt-oss-120b)",
+    "vision_provider": "Groq (qwen/qwen3.6-27b) / Azure Document Intelligence",
+    "bhashini": "Configured and active via BhashiniClient for ASR, TTS, NMT, and TLD",
+    "azure": "Configured for Document Intelligence (OCR) and Text Analytics for Health (Medical NLP)",
+    "redis": "Connected for session cache and rate limiting, with in-memory fallback dict",
+    "endpoints": [
+      "/health", "/api/v1/health",
+      "/api/v1/sessions", "/api/v1/sessions/{session_id}", "/api/v1/sessions/{session_id}/language",
+      "/api/v1/sessions/{session_id}/conversation/start", "/api/v1/sessions/{session_id}/conversation/state",
+      "/api/v1/sessions/{session_id}/conversation/answer", "/api/v1/sessions/{session_id}/conversation/speech",
+      "/api/v1/sessions/{session_id}/conversation/tts", "/api/v1/sessions/{session_id}/documents/upload",
+      "/api/v1/sessions/{session_id}/documents", "/api/v1/sessions/{session_id}/summary/generate",
+      "/api/v1/sessions/{session_id}/summary", "/api/v1/sessions/{session_id}/consent",
+      "/api/v1/languages", "/api/v1/translate", "/api/v1/fhir/preview"
+    ]
+  },
+  "kiosk": {
+    "screens": [
+      "Screen1_Welcome", "Screen2_PatientType", "Screen2_Auth", "Screen3_DepartmentSelector",
+      "Screen3b_LanguageSelect", "Screen4_SymptomIntake", "Screen6_HealthHistory",
+      "Screen8_QRUpload", "Screen9_ReviewSubmission", "Screen10_TokenSuccess"
+    ],
+    "state_store": "Zustand (useKioskStore.js)",
+    "api_service": "src/services/api.js",
+    "socket": "Empty file (0 bytes, unused)",
+    "languages_supported": 22
+  },
+  "mobile": {
+    "screens": [
+      "AuthScreen", "M1_MobileHome", "M2_DocumentType", "M3_DocumentCapture", "M4_DocumentReview",
+      "M5_DocumentAnalysis", "M6_ExtractedInformation", "M7_MedicalTimeline", "M8_HealthSummary",
+      "M9_InformationSent", "AppointmentsScreen", "MyVisitsScreen", "VisitDetailsScreen",
+      "RecordsScreen", "DocumentDetailsScreen", "PrivacyScreen", "ConsentDetailsScreen",
+      "KioskConnectScreen", "ProfileScreen", "SettingsScreen", "AboutScreen", "MoreScreen"
+    ],
+    "state_store": "Zustand (useMobileStore.js)",
+    "mock_data": "src/data/mockData.js exists (canonical demo data for Rajesh Kumar Sharma), but portalService & authService make real API calls"
+  },
+  "doctor_panel": {
+    "framework": "Next.js App Router",
+    "pages": [
+      "/login", "/(hospital)/doctor", "/(hospital)/admin/queue", "/(hospital)/admin/doctors"
+    ],
+    "patient_identity_issue": "Uses consultation.id as patient.id and fabricates UHID on the fly",
+    "backend_target_port": "Configured as 8001 in .env (mismatched, backend is 8000)"
+  },
+  "redis": {
+    "client": "redis.asyncio (in Python AI service only)",
+    "key_patterns": [
+      {
+        "pattern": "session:{session_id}",
+        "ttl": 1800,
+        "owner": "AyushCareAI",
+        "data_stored": "Full session JSON (patient_id, facility_id, language, pathway, conversation_history, document_entities, red_flags, summary)"
+      },
+      {
+        "pattern": "ratelimit:{client_ip}:{epoch_minute}",
+        "ttl": 60,
+        "owner": "AyushCareAI",
+        "data_stored": "Integer request counter"
+      }
+    ],
+    "backend_usage": "None (AyushCareBackend has no Redis connection)"
+  },
+  "qr_flow": {
+    "flow_a_kiosk_pairing": {
+      "table": "kiosk_sessions",
+      "token_format": "24-char hex randomBytes",
+      "purpose": "Zero-login mobile upload linked to active kiosk intake",
+      "data_exposed": "Kiosk pairing token in URL; exchange endpoint returns patient profile, consultation ID, department"
+    },
+    "flow_b_patient_portal_handoff": {
+      "table": "patient_qr_tokens",
+      "token_format": "base64url random token, SHA-256 stored in DB",
+      "ttl": 80,
+      "purpose": "Mobile scans kiosk screen to authenticate into Patient Portal and auto-link documents",
+      "data_exposed": "Single-use crypto token; exchange issues 8h Patient JWT"
+    }
+  },
+  "document_pipeline": {
+    "kiosk_upload": "Presigned S3 PUT -> uploaded_documents record (status: pending) -> Node triggers Python /documents/upload",
+    "mobile_upload": "Presigned S3 PUT -> uploaded_documents record -> Node triggers Python /documents/upload",
+    "ocr_provider": "Azure Document Intelligence (prebuilt-read) with fallback to Bhashini/Groq Vision/Tesseract",
+    "nlp_provider": "Azure Text Analytics for Health (Healthcare LRO) merged with Groq LLM entity extraction",
+    "abnormal_detection": "Deterministic clinical reference ranges (medical_reference.py) + LLM",
+    "drug_interaction": "Deterministic cross-checks (medical_reference.py)"
+  },
+  "bhashini": {
+    "client": "AyushCareAI/app/ai/bhashini_client.py (ULCA API)",
+    "services_implemented": ["ASR", "TTS", "Translation (NMT)", "OCR", "Text Language Detection (TLD)", "Audio Language Detection (ALD)"],
+    "direct_frontend_call": false
+  },
+  "azure": {
+    "document_intelligence": "AyushCareAI/app/ai/azure_document_intelligence.py (prebuilt-read)",
+    "text_analytics_for_health": "AyushCareAI/app/ai/azure_health_service.py (Healthcare LRO)",
+    "credentials_location": "Python .env only (AZURE_DOCUMENT_INTELLIGENCE_KEY, AZURE_LANGUAGE_KEY)"
+  },
+  "groq": {
+    "client": "AsyncGroq in AyushCareAI/app/ai/llm_service.py",
+    "clinical_model": "openai/gpt-oss-120b",
+    "vision_model": "qwen/qwen3.6-27b",
+    "usage": "Clinical interview next question, entity normalization, clinical summary synthesis, fallback translation/ASR"
+  },
+  "clinical_interview": {
+    "state_machine": "ConversationEngine (app/services/conversation_engine.py)",
+    "phases": ["EMERGENCY_SCREEN", "CHIEF_COMPLAINT", "HPI", "ASSOCIATED_SYMPTOMS", "PAST_HISTORY", "AYUSH_SPECIFIC", "COMPLETED"],
+    "max_questions": 8,
+    "red_flag_protocol": "Deterministic rule evaluation (app/domain/red_flags.py) after every patient turn",
+    "ayush_protocol": "app/domain/ayush_protocol.py (Dosha, Prakriti, Agni attributes)"
+  },
+  "authentication": {
+    "doctor_admin": "JWT signed with ACCESS_TOKEN_SECRET, stored in httpOnly cookie 'accessToken'",
+    "patient_mobile": "Mobile/ABHA + OTP (verified against in-memory otpStore) -> 8h JWT with role 'patient'",
+    "patient_qr": "Hashed single-use token exchange -> 8h JWT with role 'patient'"
+  },
+  "privacy": {
+    "model": "Hierarchical: Document rule > Visit rule > Hospital rule > Global Category Settings",
+    "tables": ["patient_privacy_rules", "privacy_settings"],
+    "granularity": "Document level, visit level, hospital level, and category flags (share_previous_reports, share_previous_appointments, share_previous_departments)"
+  },
+  "api_contracts": {
+    "status": "Partially aligned, critical mismatches identified in port configurations and admin endpoints"
+  },
+  "type_mismatches": [
+    {
+      "area": "UHID",
+      "doctor_panel": "uhid is expected as a patient field",
+      "database": "No UHID column exists; HNDPANEL fabricates UHID from consultation.id slice"
+    },
+    {
+      "area": "Doctor Workspace Patient ID",
+      "doctor_panel": "Patient.id is assigned ConsultationQueueItem.id (which is consultation_id, not patient_id)",
+      "database": "consultations.id is UUID of consultation, patients.id is UUID of patient"
+    },
+    {
+      "area": "API Port Configuration",
+      "doctor_panel_env": "NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1 (pointing to Python AI)",
+      "node_backend_port": "8000 (where /api/v1/doctor and /api/v1/admin live)"
+    }
+  ],
+  "duplications": [
+    {
+      "item": "Language registry",
+      "file_a": "AyushCareAI/app/domain/languages.py",
+      "file_b": "AyushCareBackend/src/services/languageService.js",
+      "source_of_truth": "AyushCareAI (Python ML Service)"
+    },
+    {
+      "item": "Kiosk languages constant",
+      "file_a": "AyushCareKiosk/src/constants/indianLanguages.js",
+      "file_b": "AyushCareKiosk/src/loc/22.js",
+      "source_of_truth": "Backend /api/v1/language/languages"
+    }
+  ],
+  "broken_features": [
+    {
+      "component": "Real-time WebSockets",
+      "issue": "HNDPANEL subscribes to Socket.IO events ('queue:updated', 'token:called', 'triage:red-flag'), and Kiosk has empty socket.js. Neither Node nor Python initializes a Socket.IO server."
+    },
+    {
+      "component": "Admin Queue Route",
+      "issue": "HNDPANEL calls GET /api/v1/admin/queue, but this route is never registered in AyushCareBackend/src/routes/admin.routes.js."
+    },
+    {
+      "component": "Mobile Portal Documents SQL Syntax",
+      "issue": "AyushCareBackend/src/controllers/mobile.controller.js line 855 contains a trailing comma before FROM: 'SELECT d.*, c.hospital_id, h.name AS hospital_name, c.created_at AS visit_created_at, c.status AS visit_status, FROM uploaded_documents d'."
+    },
+    {
+      "component": "Any-Doctor OPD Queue Routing",
+      "issue": "If a patient does not select a specific doctor at the kiosk, assigned_doctor_id is NULL. Doctor queue query explicitly filters `WHERE c.assigned_doctor_id = $1`, so unassigned patients are never seen by any doctor."
+    },
+    {
+      "component": "OTP Storage Resiliency",
+      "issue": "OTP storage in Node backend is an in-memory Map. Restarts drop active OTPs, and the hardcoded 123456 bypass is active in production code."
+    }
+  ],
+  "abha_migration_blueprint": {
+    "recommendation": "Preserve internal technical surrogate UUIDs (patients.id) for all database foreign keys. Elevate abha_number to NOT NULL UNIQUE canonical business identity.",
+    "database_changes": [
+      "Make patients.abha_number NOT NULL UNIQUE after backfilling existing records",
+      "Add indexes on patients(abha_number)",
+      "Keep consultations.patient_id, patient_qr_tokens.patient_id, patient_privacy_rules.patient_id referencing patients.id UUID"
+    ],
+    "api_changes": [
+      "Accept abha_number as public identifier on all public API routes",
+      "Stop exposing internal patients.id UUID in public frontend responses",
+      "Include abha_number in JWT claims alongside internal id for authorized session context"
+    ]
+  }
+}
