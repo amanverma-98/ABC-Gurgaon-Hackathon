@@ -105,3 +105,4 @@ See `.env.example` for all required configuration. Key P2Care additions:
 - Use `NODE_ENV=production` and HTTPS for production cookies.
 - Keep AWS, AI, and Bhashini credentials on the server only.
 - Emergency access grants enforce a strict 36-hour maximum server-side.
+
