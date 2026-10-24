@@ -1,6 +1,6 @@
 <div align="center">
 
-# AyushCare
+# P2Care
 
 **Patient to Care. Without Delay.**
 
@@ -34,7 +34,7 @@ P2Care supports unidentified patient intake, SOS management, and time-limited ac
 | --- | --- | --- | --- |
 | Multilingual kiosk intake, voice and touch interaction, mobile continuity, and patient-controlled privacy | Adaptive interview, document extraction, red-flag detection, vitals, and clinician-reviewed summaries | Department routing, doctor assignment, OPD tokens, queue visibility, rosters, rooms, and consultation sign-off | Emergency/SOS intake, unidentified patient workflow, 36-hour access grants, case management, and audit trail |
 
-AyushCare is built around one connected handoff: **the patient tells their story once, the system
+P2Care is built around one connected handoff: **the patient tells their story once, the system
 organizes it responsibly, and the care team starts with context.**
 
 ## Contents
