@@ -259,8 +259,8 @@ export const AboutScreen = () => {
 
           <p className="text-[9px] text-slate-400 mt-0.5">
             {isHindi
-              ? "SIH 2026 प्रोटोटाइप"
-              : "SIH 2026 Prototype"}
+              ? "P2Care — पेशेंट टू केयर"
+              : "P2Care — Patient to Care. Without Delay."}
           </p>
         </div>
       </main>

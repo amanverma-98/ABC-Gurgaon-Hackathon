@@ -1,13 +1,11 @@
 <div align="center">
 
-![Smart India Hackathon 2026](./AyushCareKiosk/public/sih-2026-dark.png)
+# P2Care
 
-<br>
+**Patient to Care. Without Delay.**
 
-# AyushCare MediKiosk
-
-**AI-assisted multilingual patient intake and clinical handoff**<br>
-*From registration and triage to documents, vitals, queueing, and physician review*
+AI-assisted multilingual patient intake, emergency management, and clinical handoff.<br>
+*From registration and triage to emergency response, documents, vitals, queueing, and physician review.*
 
 <br>
 
@@ -21,27 +19,29 @@
 
 <br>
 
-> **A better first five minutes of care.** AyushCare turns a patient’s arrival into a structured,
+> **Patient to Care. Without Delay.** P2Care turns a patient's arrival — routine or emergency — into a structured,
 > multilingual clinical intake that can be reviewed by the right doctor with less repetition and
 > less paperwork.
 
-AyushCare is a connected healthcare platform for hospitals and clinics. A patient can begin at a
+P2Care is a connected healthcare platform for hospitals and clinics. A patient can begin at a
 physical kiosk, continue on a phone through a QR handoff, and arrive in a doctor workspace with
-structured history, vitals, documents, consent, risk signals, and queue context.
+structured history, vitals, documents, consent, risk signals, and queue context. In emergencies,
+P2Care supports unidentified patient intake, SOS management, and time-limited access authorization.
 
 ## At a glance
 
-| Patient experience | Clinical intelligence | Hospital operations |
-| --- | --- | --- |
-| Multilingual kiosk intake, voice and touch interaction, mobile continuity, and patient-controlled privacy | Adaptive interview, document extraction, red-flag detection, vitals, and clinician-reviewed summaries | Department routing, doctor assignment, OPD tokens, queue visibility, rosters, rooms, and consultation sign-off |
+| Patient experience | Clinical intelligence | Hospital operations | Emergency response |
+| --- | --- | --- | --- |
+| Multilingual kiosk intake, voice and touch interaction, mobile continuity, and patient-controlled privacy | Adaptive interview, document extraction, red-flag detection, vitals, and clinician-reviewed summaries | Department routing, doctor assignment, OPD tokens, queue visibility, rosters, rooms, and consultation sign-off | Emergency/SOS intake, unidentified patient workflow, 36-hour access grants, case management, and audit trail |
 
-AyushCare is built around one connected handoff: **the patient tells their story once, the system
+P2Care is built around one connected handoff: **the patient tells their story once, the system
 organizes it responsibly, and the care team starts with context.**
 
 ## Contents
 
 - [Why it matters](#why-it-matters)
 - [What it does](#what-it-does)
+- [Emergency features](#emergency-features)
 - [Patient journey](#patient-journey)
 - [System architecture](#system-architecture)
 - [AI and clinical safety](#ai-and-clinical-safety)
@@ -49,8 +49,8 @@ organizes it responsibly, and the care team starts with context.**
 - [Demonstration flow](#demonstration-flow)
 - [Repository structure](#repository-structure)
 - [Technology stack](#technology-stack)
-- [Current implementation status](#current-implementation-status)
 - [Run locally](#run-locally)
+- [Demo credentials](#demo-credentials)
 - [Documentation](#documentation)
 
 <br>
@@ -59,16 +59,18 @@ organizes it responsibly, and the care team starts with context.**
 
 The front desk is often where clinical information gets fragmented. Patients repeat the same story,
 reports stay in paper folders, and doctors spend valuable consultation time reconstructing context.
-AyushCare moves that work earlier in the journey while keeping clinical decisions with the physician.
+In emergencies, unidentified patients arrive without records, and staff need structured workflows
+to provide care without delay. P2Care addresses both routine and emergency scenarios.
 
-| Before the consultation | AyushCare workflow |
+| Before the consultation | P2Care workflow |
 | --- | --- |
 | Repeated registration questions | Guided, stateful patient intake |
 | Paper prescriptions and reports | QR-assisted phone upload and document processing |
 | Unstructured patient history | AI-assisted clinical summary with source context |
 | Unclear department routing | Department, pathway, doctor, and token flow |
 | Language and accessibility barriers | Multilingual UI plus voice input and narration |
-| Uncontrolled record sharing | Granular consent and patient privacy controls |
+| Uncontrolled record sharing | Granular consent, patient privacy controls, and scoped access grants |
+| No emergency workflow | SOS/emergency intake, unidentified patient management, time-limited access |
 
 ## What it does
 
@@ -81,6 +83,17 @@ AyushCare moves that work earlier in the journey while keeping clinical decision
 - **QR continuity** — pair a kiosk session with a mobile portal so patients can upload documents from their own phone.
 - **Privacy and consent** — DPDPA-oriented consent receipts, privacy settings, scoped sharing rules, and audit events.
 - **Clinician workspace** — doctor queue, patient summary, reports, vitals, notes, and consultation sign-off.
+
+## Emergency features
+
+P2Care extends the core platform with emergency care capabilities:
+
+- **Emergency intake** — structured emergency case creation from the kiosk or HNDPANEL, with category selection, presenting complaint, and triage urgency.
+- **Unidentified patient workflow** — separate emergency case storage for patients who cannot be identified, with controlled identity linking when verification becomes possible.
+- **SOS management** — persistent SOS incidents with acknowledge, assign, escalate, update, and resolve actions.
+- **Time-limited access grants** — backend-enforced patient data access with a maximum 36-hour validity, scoped to specific data categories, with mandatory audit logging.
+- **Emergency dashboard** — real-time case list in HNDPANEL with status badges, urgency indicators, staff assignment, and action timeline.
+- **Audit trail** — append-only logging of all access grants, case actions, and data access attempts.
 
 ## Patient journey
 
@@ -97,23 +110,39 @@ flowchart LR
   I --> J[Doctor review and sign-off]
 ```
 
+### Emergency path
+
+```mermaid
+flowchart LR
+  A[Emergency arrival] --> B{Patient identified?}
+  B -->|Yes| C[SOS with identity]
+  B -->|No| D[Unidentified emergency intake]
+  C --> E[Case created + staff alerted]
+  D --> E
+  E --> F[Acknowledge + assign]
+  F --> G[Treatment + time-limited access grant]
+  G --> H[Identity confirmation when possible]
+  H --> I[Resolve case]
+```
+
 ## System architecture
 
 ```mermaid
 flowchart TD
-  Kiosk[AyushCare Kiosk<br/>React + Vite] --> API[AyushCare Backend<br/>Node.js + Express]
+  Kiosk[P2Care Kiosk<br/>React + Vite] --> API[P2Care Backend<br/>Node.js + Express]
   Mobile[Patient Mobile Portal<br/>React + Vite] --> API
   Panel[Doctor and Admin Panel<br/>Next.js + TypeScript] --> API
   API --> DB[(PostgreSQL / Neon)]
   API --> S3[(S3-compatible document storage)]
-  API --> AI[AyushCare AI<br/>FastAPI]
+  API --> AI[P2Care AI<br/>FastAPI]
   AI --> Providers[LLM / ASR / TTS / OCR / Translation providers]
   AI --> AIDB[(AI session store)]
 ```
 
 The core API owns identity, consultations, routing, queue state, document registration, consent,
-privacy, and portal access. The Python service owns the clinical conversation, document intelligence,
-summary generation, safety checks, and FHIR preview. Frontends remain presentation and workflow clients.
+privacy, emergency cases, access grants, and portal access. The Python service owns the clinical
+conversation, document intelligence, summary generation, safety checks, and FHIR preview.
+Frontends remain presentation and workflow clients.
 
 ## AI and clinical safety
 
@@ -131,46 +160,47 @@ The AI layer is assistive by design. It does **not** diagnose, prescribe, or rep
 
 ## Product surfaces
 
-### 1. AyushCare Kiosk
+### 1. P2Care Kiosk
 
 <table>
   <tr>
     <td align="center">
-      <img src="./docs/screenshots/kiosk-welcome.png" alt="AyushCare kiosk welcome screen" width="360">
+      <img src="./docs/screenshots/kiosk-welcome.png" alt="P2Care kiosk welcome screen" width="360">
       <br><sub>Welcome, language, and accessible intake start</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/kiosk-health-interview.png" alt="AyushCare health interview" width="360">
+      <img src="./docs/screenshots/kiosk-health-interview.png" alt="P2Care health interview" width="360">
       <br><sub>Emergency symptom screening and guided interview</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/kiosk-mobile-document-upload.png" alt="AyushCare mobile document upload" width="360">
+      <img src="./docs/screenshots/kiosk-mobile-document-upload.png" alt="P2Care mobile document upload" width="360">
       <br><sub>QR handoff for mobile document upload</sub>
     </td>
   </tr>
 </table>
 
 The kiosk combines language selection, privacy messaging, voice and touch interaction, emergency
-screening, guided responses, and a secure QR handoff for prescriptions and reports.
+screening, guided responses, and a secure QR handoff for prescriptions and reports. In emergencies,
+the kiosk supports unidentified patient intake with category selection and immediate staff alerting.
 
-### 2. AyushCare Mobile
+### 2. P2Care Mobile
 
 <table>
   <tr>
     <td align="center">
-      <img src="./docs/screenshots/mobile-home-vitals.png" alt="AyushCare mobile home and vitals" width="220">
+      <img src="./docs/screenshots/mobile-home-vitals.png" alt="P2Care mobile home and vitals" width="220">
       <br><sub>Home and verified vitals</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/mobile-visits.png" alt="AyushCare mobile visits" width="220">
+      <img src="./docs/screenshots/mobile-visits.png" alt="P2Care mobile visits" width="220">
       <br><sub>Visits and appointments</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/mobile-records.png" alt="AyushCare mobile records" width="220">
+      <img src="./docs/screenshots/mobile-records.png" alt="P2Care mobile records" width="220">
       <br><sub>Medical records</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/mobile-settings.png" alt="AyushCare mobile settings" width="220">
+      <img src="./docs/screenshots/mobile-settings.png" alt="P2Care mobile settings" width="220">
       <br><sub>Privacy and settings</sub>
     </td>
   </tr>
@@ -179,104 +209,46 @@ screening, guided responses, and a secure QR handoff for prescriptions and repor
 The mobile portal carries the patient beyond the kiosk: active consultation status, queue context,
 visits, records, appointments, profile details, and privacy controls remain available from one place.
 
-### 3. AyushCare Doctor and Admin Panel
+### 3. P2Care Doctor and Admin Panel
 
 <table>
   <tr>
     <td align="center">
-      <img src="./docs/screenshots/doctor-clinical-workspace.png" alt="AyushCare doctor clinical workspace" width="520">
+      <img src="./docs/screenshots/doctor-clinical-workspace.png" alt="P2Care doctor clinical workspace" width="520">
       <br><sub>Doctor clinical workspace: queue, AI summary, evidence, editing, and sign-off</sub>
     </td>
     <td align="center">
-      <img src="./docs/screenshots/admin-control-desk.png" alt="AyushCare admin control desk" width="520">
-      <br><sub>Admin control desk: rosters, departments, rooms, schedules, and duty status</sub>
+      <img src="./docs/screenshots/admin-control-desk.png" alt="P2Care admin control desk" width="520">
+      <br><sub>Admin control desk: emergency dashboard, rosters, departments, rooms, and schedules</sub>
     </td>
   </tr>
 </table>
 
 The doctor and admin surfaces turn the intake record into coordinated action: clinicians verify the
-AI-assisted history, while hospital teams manage the people, departments, rooms, and queues behind care delivery.
-
-The screenshot set is stored in [docs/screenshots](docs/screenshots) and represents the implemented
-workflows across all three AyushCare surfaces: patient kiosk, patient mobile portal, and doctor/admin
-operations.
-
-## What makes the workflow different
-
-1. **Patient-first capture** — the kiosk is designed around language choice, accessibility, voice, touch, and guided questions.
-2. **Structured before intelligent** — answers, vitals, documents, and consent become usable records before AI adds interpretation.
-3. **Human verification stays visible** — AI summaries carry confidence and source context, with editing and sign-off built into the doctor workflow.
-4. **Continuity across devices** — QR pairing lets the patient move from a public kiosk to their private phone without restarting the journey.
-5. **Operations are part of care** — routing, OPD tokens, rosters, rooms, and queue states connect intake to the consultation itself.
-
-## Demonstration flow
-
-```mermaid
-sequenceDiagram
-  participant Patient
-  participant Kiosk as AyushCare Kiosk
-  participant Mobile as AyushCare Mobile
-  participant API as Core API
-  participant AI as AI Service
-  participant Doctor as Doctor Panel
-  participant Admin as Admin Panel
-
-  Patient->>Kiosk: Select language and provide consent
-  Kiosk->>API: Create patient consultation
-  Kiosk->>AI: Start guided clinical interview
-  AI-->>Kiosk: Questions, answers, and safety signals
-  Kiosk->>Mobile: Display secure QR handoff
-  Mobile->>API: Upload and register medical documents
-  API->>AI: Process OCR and extract clinical entities
-  AI-->>API: Return document findings and summary data
-  API-->>Doctor: Queue item, vitals, reports, and AI draft
-  Doctor->>Doctor: Verify, edit, and sign off
-  Admin->>API: Manage doctors, departments, rooms, and queue operations
-```
+AI-assisted history, while hospital teams manage emergency cases, departments, rooms, and queues.
 
 ## Repository structure
 
 ```text
-Medikiosk/
+P2Care/
 ├── AyushCareAI/              # FastAPI clinical AI service and tests
-├── AyushCareBackend/         # Express API, PostgreSQL access, auth, queue, QR, and storage
+├── AyushCareBackend/         # Express API, PostgreSQL access, auth, emergency, queue, and storage
 ├── AyushCareKiosk/           # React/Vite patient kiosk experience
 ├── AyushCareMobile/          # React/Vite mobile portal and document flow
-├── HNDPANEL/                 # Next.js doctor and hospital admin panel
+├── HNDPANEL/                 # Next.js doctor and hospital admin panel (with emergency dashboard)
 ├── docs/screenshots/         # Product walkthrough screenshots
-├── MEDIKIOSK_CURRENT_STATE_AUDIT.md
-└── MEDIKIOSK_CURRENT_STATE_AUDIT.json
+└── requirements.md           # P2Care extension requirements specification
 ```
 
 ## Service map
 
 | Service | Responsibility | Default port |
 | --- | --- | ---: |
-| `AyushCareKiosk` | Patient check-in, intake, consent, interview, vitals, QR handoff | `5173` |
+| `AyushCareKiosk` | Patient check-in, intake, consent, interview, vitals, SOS/emergency, QR handoff | `5173` |
 | `AyushCareMobile` | Patient portal, documents, visits, records, and privacy | `5174` |
-| `AyushCareBackend` | Auth, consultations, routing, queue, QR sessions, storage, and APIs | `8000` |
-| `AyushCareAI` | Conversation, speech, OCR, extraction, safety, summaries, and FHIR preview | `8001` |
-| `HNDPANEL` | Doctor clinical workspace and hospital administration | `3000` |
-
-## Core data model
-
-```mermaid
-erDiagram
-  PATIENTS ||--o{ CONSULTATIONS : has
-  HOSPITALS ||--o{ DEPARTMENTS : contains
-  CONSULTATIONS ||--o| CLINICAL_SUMMARIES : produces
-  CONSULTATIONS ||--o| VITALS : records
-  CONSULTATIONS ||--o{ UPLOADED_DOCUMENTS : contains
-  CONSULTATIONS ||--o{ CONSENT_RECORDS : requires
-  PATIENTS ||--o| PRIVACY_SETTINGS : controls
-  PATIENTS ||--o{ PATIENT_PRIVACY_RULES : defines
-  CONSULTATIONS ||--o| KIOSK_SESSIONS : pairs
-  PATIENTS ||--o{ PATIENT_QR_TOKENS : receives
-```
-
-The backend uses PostgreSQL with UUID-based internal identities and unique ABHA identifiers. The AI
-service has its own session and audit persistence boundary, with Redis support and an in-memory fallback
-for development. Documents are stored through an S3-compatible object-storage integration.
+| `AyushCareBackend` | Auth, consultations, routing, queue, emergency cases, access grants, QR sessions, storage | `8001` |
+| `AyushCareAI` | Conversation, speech, OCR, extraction, safety, summaries, and FHIR preview | `8000` |
+| `HNDPANEL` | Doctor clinical workspace, emergency/SOS dashboard, and hospital administration | `3000` |
 
 ## Technology stack
 
@@ -288,48 +260,6 @@ for development. Documents are stored through an S3-compatible object-storage in
 | Core backend | Node.js, Express, PostgreSQL, JWT, AWS S3 SDK |
 | AI service | Python, FastAPI, Pydantic, SQLAlchemy, Redis |
 | AI integrations | Gemini, Groq, Bhashini, Azure Document Intelligence, Azure Language, Tesseract |
-| Testing | Pytest safety and service suites, frontend lint/build scripts |
-
-## Current implementation status
-
-The repository contains an end-to-end working prototype spanning five applications:
-
-- 10 kiosk screens and a multilingual patient intake flow.
-- 23 mobile/portal screens covering home, visits, appointments, records, privacy, and QR connection.
-- Doctor queue and clinical workspace with summary, reports, vitals, and sign-off paths.
-- AI tests covering conversation, clinical summaries, document intelligence, FHIR, red flags, and safety.
-- Backend routes for auth, intake, mobile portal, language, documents, consent, privacy, routing, and queueing.
-
-Some infrastructure capabilities remain environment-dependent. For example, production credentials,
-PostgreSQL, object storage, provider APIs, and SMS configuration must be supplied separately. The audit
-file is the source of truth for the current implementation boundaries and known gaps.
-
-## Verification checklist
-
-Use these checks before a demo or integration handoff:
-
-```bash
-# AI service tests
-cd AyushCareAI
-pytest tests/ -v
-
-# Frontend checks
-cd ../AyushCareKiosk
-npm run lint
-npm run build
-
-cd ../AyushCareMobile
-npm run lint
-npm run build
-
-cd ../HNDPANEL
-npm run lint
-npm run build
-```
-
-For a complete demo, start the AI service and core backend first, then launch the kiosk, mobile portal,
-and doctor/admin panel. Confirm that the frontend API URLs and server-side provider credentials match the
-local environment before testing a live patient flow.
 
 ## Run locally
 
@@ -337,7 +267,7 @@ local environment before testing a live patient flow.
 
 - Python 3.10+
 - Node.js and npm
-- PostgreSQL for the core backend
+- PostgreSQL (Neon or local)
 - Redis is recommended for the AI service
 - Provider credentials configured in server-side `.env` files
 
@@ -348,13 +278,7 @@ cd AyushCareAI
 python -m venv .venv
 .venv\Scripts\activate        # Windows
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001
-```
-
-Run the AI tests:
-
-```bash
-pytest tests/ -v
+uvicorn app.main:app --reload --port 8000
 ```
 
 ### Start the core backend
@@ -362,8 +286,17 @@ pytest tests/ -v
 ```bash
 cd AyushCareBackend
 npm install
-npm run dev                    # port 8000
+npm run dev                    # port 8001
 ```
+
+### Bootstrap the database (schema + demo data)
+
+```bash
+cd AyushCareBackend
+node src/database/bootstrap.js
+```
+
+> **Warning:** Verify the `DATABASE_URL` in `.env` points to the correct P2Care database before running.
 
 ### Start the patient applications
 
@@ -387,12 +320,28 @@ npm install
 npm run dev                    # Next.js, normally port 3000
 ```
 
-Each service should be configured with the API URL expected by its local environment. Keep database,
-AI, storage, SMS, and authentication secrets on the server and never commit `.env` files.
+## Demo credentials
+
+After running the bootstrap script, the following test accounts are available:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Hospital Admin | `admin@ayushcare.com` | `Admin@123` |
+| Doctor (General Medicine) | `dr.rajesh.sharma@ayushcare.com` | `Doctor@123` |
+| Doctor (Cardiology) | `dr.ananya.sen@ayushcare.com` | `Doctor@123` |
+
+**Patient lookups (kiosk):**
+
+| Name | ABHA Number | Mobile |
+| --- | --- | --- |
+| Ramesh Kumar | `14-1111-2222-3333` | `9876543210` |
+| Sunita Devi | `14-2222-3333-4444` | `9876543211` |
+
+The HNDPANEL login page includes one-click auto-fill buttons for all demo credentials.
 
 ## Documentation
 
-- [Current state audit](MEDIKIOSK_CURRENT_STATE_AUDIT.md) — architecture, routes, database, privacy, and integration findings.
+- [P2Care Requirements](requirements.md) — emergency extension requirements specification.
 - [AI service README](AyushCareAI/README.md) — AI endpoints, providers, safety modules, and test commands.
 - [Backend README](AyushCareBackend/README.md) — core API setup and integration notes.
 - [Kiosk README](AyushCareKiosk/README.md) — kiosk workflow and frontend setup.
@@ -401,9 +350,9 @@ AI, storage, SMS, and authentication secrets on the server and never commit `.en
 
 ## Safety and privacy note
 
-AyushCare is a clinical intake and decision-support prototype. AI output must be reviewed by qualified
-clinical staff before it is used in care. Deployments must complete their own security, privacy,
-clinical-safety, consent, and regulatory review before handling real patient data.
+P2Care is a clinical intake, emergency management, and decision-support platform. AI output must be
+reviewed by qualified clinical staff before it is used in care. Deployments must complete their own
+security, privacy, clinical-safety, consent, and regulatory review before handling real patient data.
 
 ## Licence
 

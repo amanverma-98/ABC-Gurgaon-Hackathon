@@ -1,30 +1,41 @@
-# AyushCare Kiosk
+# P2Care Kiosk
 
-Patient-facing kiosk frontend connected to the AyushCare backend and MediKiosk AI gateway. Doctor/admin screens are outside this app scope.
+Patient-facing kiosk application for P2Care — multilingual intake, AI clinical interview, emergency SOS, and clinical handoff.
 
-## Flow
-1. Welcome + 22-language switch
-2. Patient identification + pathway selection (Ayurveda/Allopathy)
-3. Backend department/doctor routing
-4. Adaptive MediKiosk AI interview
-5. Vitals
-6. Mobile QR document upload + backend sync
-7. AI summary + consent
-8. OPD token + completion
+## Features
 
-## Environment
-Copy `.env.example` to `.env`:
+- Multilingual welcome and language selection
+- ABHA identity verification and patient registration
+- Department and pathway routing (Allopathy / Ayurveda)
+- AI-guided clinical interview (text + voice)
+- Vitals capture and red-flag screening
+- QR handoff for mobile document upload
+- Clinical summary generation and review
+- Consent management and privacy controls
+- Token generation and queue assignment
+- **Emergency/SOS intake** — identified SOS with OTP and unidentified emergency intake with category selection
 
-```env
-VITE_API_BASE_URL=http://localhost:8001/api/v1
-VITE_KIOSK_ID=KIOSK-MAIN-01
-VITE_MOBILE_PAIR_URL=http://localhost:5174
+## Run
+
+```bash
+npm install
+npm run dev       # Vite dev server, default port 5173
 ```
 
-`VITE_MOBILE_PAIR_URL` must match the route used by the final AyushCare Mobile app to receive a `pairing_token`.
+## Build
 
-## Architecture
-React calls only the AyushCare backend. AI and Bhashini credentials stay server-side. Dynamic questions, red flags, summaries and speech are supplied by backend/AI; static kiosk controls use local language dictionaries for the 22 supported Indian languages.
+```bash
+npm run build
+npm run preview   # Preview production build
+```
 
-## Note on QR rendering
-The screen includes a QR image generated from the short-lived pairing payload and always shows the pairing code as a fallback. For a fully offline kiosk deployment, replace the remote QR renderer with a bundled QR generator without changing the pairing API contract.
+## Configuration
+
+The kiosk connects to the P2Care Backend API. Configure the API base URL in the environment or service configuration. Default: `http://localhost:8001`.
+
+## Tech Stack
+
+- React + Vite
+- Zustand (state management)
+- Axios (HTTP client)
+- Lucide React (icons)

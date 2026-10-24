@@ -48,7 +48,7 @@ const aboutCode = fs.readFileSync(aboutPath, "utf-8");
 assert.ok(!aboutCode.includes("Production Edition"), "About screen must NOT claim 'Production Edition'");
 assert.ok(!aboutCode.includes("ABDM Compliant"), "About screen must NOT claim official compliance certification");
 assert.ok(!aboutCode.includes("DPDP certified"), "About screen must NOT claim DPDP certified");
-assert.ok(aboutCode.includes("Prototype for SIH 2026"), "About screen must state 'Prototype for SIH 2026'");
+assert.ok(aboutCode.includes("P2Care"), "About screen must state 'P2Care'");
 assert.ok(aboutCode.includes("Version 1.0.0"), "About screen must retain 'Version 1.0.0'");
 assert.ok(aboutCode.includes("MediKiosk"), "About screen must retain 'MediKiosk'");
 assert.ok(aboutCode.includes("Patient Health Companion"), "About screen must retain 'Patient Health Companion'");

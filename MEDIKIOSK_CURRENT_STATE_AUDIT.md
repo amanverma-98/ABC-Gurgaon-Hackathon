@@ -42,7 +42,7 @@
 ## PART 1 — PROJECT STRUCTURE
 
 ```
-SIH26047V2/
+P2Care/
 ├── AyushCareAI/                # Python FastAPI AI / ML Microservice (Port 8001)
 │   ├── app/
 │   │   ├── ai/                 # AI provider clients (Bhashini, Azure, Groq, OCR, ASR, TTS, NMT)
@@ -121,8 +121,8 @@ SIH26047V2/
 ## PART 2 — NODE.JS BACKEND ARCHITECTURE
 
 - **Framework**: Express.js (ES Modules `"type": "module"`)
-- **Server Entry Point**: [src/index.js](file:///d:/Users/SomuData/Desktop/SIH26047V2/AyushCareBackend/src/index.js)
-- **App Entry Point**: [src/app.js](file:///d:/Users/SomuData/Desktop/SIH26047V2/AyushCareBackend/src/app.js)
+- **Server Entry Point**: [src/index.js](file:///d:/Users/SomuData/Desktop/P2Care/AyushCareBackend/src/index.js)
+- **App Entry Point**: [src/app.js](file:///d:/Users/SomuData/Desktop/P2Care/AyushCareBackend/src/app.js)
 - **Database Engine**: PostgreSQL (Neon Serverless Pool via `pg.Pool` in `src/database/dbConnection.js`)
 - **ORM / Query Builder**: Raw parameterized SQL queries (`pool.query`)
 - **Schema Management**: DDL statements executed inside a transaction on startup via `src/database/initSchema.js`
@@ -461,7 +461,7 @@ Mobile/Kiosk Upload ──► Presigned S3 PUT ──► Node.js Backend
 
 ## PART 11 — BHASHINI AUDIT
 
-- **Client Location**: [AyushCareAI/app/ai/bhashini_client.py](file:///d:/Users/SomuData/Desktop/SIH26047V2/AyushCareAI/app/ai/bhashini_client.py)
+- **Client Location**: [AyushCareAI/app/ai/bhashini_client.py](file:///d:/Users/SomuData/Desktop/P2Care/AyushCareAI/app/ai/bhashini_client.py)
 - **Protocol**: India ULCA API (`https://meity-auth.ulcacontrib.org/ulca/apis/v0/model/getModelsPipeline`)
 - **Direct Frontend Access**: **NONE**. The frontend never communicates with Bhashini directly.
 - **Implemented Services**:
@@ -493,7 +493,7 @@ Mobile/Kiosk Upload ──► Presigned S3 PUT ──► Node.js Backend
 
 ## PART 13 — GROQ AUDIT
 
-- **Client Location**: [AyushCareAI/app/ai/llm_service.py](file:///d:/Users/SomuData/Desktop/SIH26047V2/AyushCareAI/app/ai/llm_service.py)
+- **Client Location**: [AyushCareAI/app/ai/llm_service.py](file:///d:/Users/SomuData/Desktop/P2Care/AyushCareAI/app/ai/llm_service.py)
 - **Clinical Reasoning Model**: `openai/gpt-oss-120b` (Temperature: 0.2)
 - **Vision Model**: `qwen/qwen3.6-27b`
 - **Whisper Model**: `whisper-large-v3-turbo`

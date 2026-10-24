@@ -276,7 +276,7 @@ export const translations = {
     settings_reduce_motion: "Reduce Motion",
     settings_reduce_motion_sub: "Minimizes screen transitions and animations",
     settings_about_heading: "About MediKiosk",
-    settings_about_sub: "Patient Health Companion prototype for SIH 2026 · Version 1.0.0",
+    settings_about_sub: "P2Care — Patient to Care. Without Delay. · Version 1.0.0",
     settings_btn_logout: "Log Out of MediKiosk",
     settings_logout_confirm_title: "Log out of MediKiosk?",
     settings_logout_confirm_sub: "Your local mobile session will be signed out. Your saved health records, visits, appointments, and privacy settings will not be deleted.",

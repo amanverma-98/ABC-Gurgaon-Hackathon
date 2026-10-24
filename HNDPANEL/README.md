@@ -1,34 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# P2Care Hospital & Doctor Panel (HNDPANEL)
 
-## Getting Started
+Next.js admin and doctor panel for P2Care — clinical workspace, emergency/SOS dashboard, and hospital operations.
 
-First, run the development server:
+## Features
+
+### Doctor Console
+- Patient queue and consultation management
+- AI-generated clinical summary with accept/reject/edit workflow
+- Patient vitals, uploaded documents, and report review
+- Consultation notes and sign-off
+
+### Hospital Admin
+- **Emergency / SOS Dashboard** — real-time case list, acknowledge, assign, escalate, resolve, notes, and action timeline
+- **Unidentified Emergency Cases** — separate workflow for patients who cannot be identified
+- Department and pathway management (Allopathy / Ayurveda)
+- Doctor roster, room assignment, and schedule management
+- OPD token and queue operations
+
+### Access Management
+- Time-limited patient data access grants (≤36 hours, server-enforced)
+- Scoped data categories with mandatory audit logging
+- Access expiry and revocation support
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev       # Next.js dev server, default port 3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Build
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+npm start         # Production server
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Demo Credentials
 
-## Learn More
+The login page includes one-click auto-fill buttons for testing:
 
-To learn more about Next.js, take a look at the following resources:
+| Role | Email | Password |
+| --- | --- | --- |
+| Hospital Admin | `admin@ayushcare.com` | `Admin@123` |
+| Doctor (General Medicine) | `dr.rajesh.sharma@ayushcare.com` | `Doctor@123` |
+| Doctor (Cardiology) | `dr.ananya.sen@ayushcare.com` | `Doctor@123` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Configuration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Connects to the P2Care Backend API. Configure `NEXT_PUBLIC_API_URL` in environment. Default: `http://localhost:8001`.
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Next.js 16 (App Router)
+- React + TypeScript
+- Tailwind CSS
+- Zustand (auth state management)
+- Axios (HTTP client)
+- Lucide React (icons)

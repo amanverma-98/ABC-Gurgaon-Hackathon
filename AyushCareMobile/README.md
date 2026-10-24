@@ -1,17 +1,39 @@
-# AyushCare Mobile
+# P2Care Mobile
 
-Mobile companion application for the SIH26047 Patient Case-Taking Software project.
+Patient mobile companion for P2Care — QR-connected document uploads, visit history, records, and privacy controls.
 
-The mobile application is intended to work alongside the AyushCare hospital kiosk.
+## Features
 
----
+- OTP-based patient authentication
+- Active consultation status and queue context
+- Visit history and appointment tracking
+- Medical records and document vault
+- QR kiosk pairing for document upload
+- Privacy settings and consent management
+- Health summary and vitals view
 
-## Project Structure
+## Run
 
-```text
-SIH26047/
-├── AyushCare/
-│   └── Kiosk frontend
-│
-└── AyushCareMobile/
-    └── Mobile companion frontend
+```bash
+npm install
+npm run dev       # Vite dev server, default port 5174
+```
+
+## Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Configuration
+
+Connects to the P2Care Backend API. Default: `http://localhost:8001`.
+
+## Tech Stack
+
+- React + Vite
+- React Router
+- React Hook Form + Zod
+- Zustand (state management)
+- Axios (HTTP client)

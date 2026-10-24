@@ -68,11 +68,11 @@ export default function LoginPage() {
       <div className="w-full max-w-5xl flex flex-col md:flex-row items-stretch justify-center gap-6 lg:gap-8 z-10 my-auto">
         
         {/* ============================================================ */}
-        {/* LEFT / SIDE PANEL: SIH Evaluation & Demo Quick-Fill Card    */}
+        {/* LEFT / SIDE PANEL: P2Care Demo & Quick-Fill Card         */}
         {/* ============================================================ */}
         <aside className="w-full md:w-[380px] lg:w-[420px] bg-white/95 md:bg-emerald-50/60 backdrop-blur-md border border-emerald-200/90 rounded-3xl shadow-xl p-6 sm:p-7 flex flex-col justify-between text-slate-800 transition-all">
           <div>
-            {/* SIH Header Banner */}
+            {/* P2Care Header Banner */}
             <div className="flex items-center justify-between gap-2 mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-xl bg-teal-800 text-teal-200 flex items-center justify-center shadow-xs">
@@ -80,7 +80,7 @@ export default function LoginPage() {
                 </div>
                 <div>
                   <h2 className="text-xs sm:text-sm font-extrabold text-teal-950 uppercase tracking-wider">
-                    SIH Evaluation Desk
+                    P2Care Demo Desk
                   </h2>
                   <p className="text-[10px] text-teal-700 font-semibold">
                     Instant Evaluator Quick-Access
